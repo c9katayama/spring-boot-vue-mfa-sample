@@ -1,0 +1,39 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.2'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'eclipse'
+	id 'idea'
+}
+
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'com.warrenstrange:googleauth:1.5.0'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+task npmRunBuild() {
+	if (!file("${rootDir}/web/node_modules").exists()) {
+		"npm --prefix ${rootDir}/web install ${rootDir}/web"
+                .execute()
+                .waitForProcessOutput(System.out, System.err)
+    }
+    "npm --prefix ${rootDir}/web run build"
+            .execute()
+            .waitForProcessOutput(System.out, System.err)
+}
+
+processResources {
+    dependsOn npmRunBuild
+}
